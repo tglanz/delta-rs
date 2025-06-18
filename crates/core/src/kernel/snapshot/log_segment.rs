@@ -772,6 +772,25 @@ pub(super) mod tests {
         }
     }
 
+    #[test]
+    pub fn is_commit_file_only_matches_commits() {
+        for path in [0, 1, 5, 10, 100, i64::MAX]
+            .into_iter()
+            .map(crate::logstore::commit_uri_from_version)
+        {
+            assert!(path.is_commit_file());
+        }
+
+        let not_commits = ["_delta_log/_commit_2132c4fe-4077-476c-b8f5-e77fea04f170.json.tmp"];
+
+        for not_commit in not_commits {
+            let path = Path::from(not_commit);
+            assert!(!path.is_commit_file());
+        }
+    }
+
+    // This test is currently broken because of https://github.com/apache/arrow-rs/pull/7539.
+    #[ignore]
     #[tokio::test]
     async fn test_checkpoint_stream_parquet_read() {
         let metadata = Metadata {
